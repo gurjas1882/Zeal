@@ -12,6 +12,8 @@
   - [ ] add the ability to choose action (i.e. make practice material, flash cards, etc \* even though they don't have functionality)
 - [ ] Make the loading icon go in the middle of the screen
 - [ ] Make the notes preload on app start rather then screen load so it doesn't waste user time
+- [ ] When clicking continue on the note generation, make it take you back to the notes menu when its done getting the text
+- [ ] Make refresh logic work
 
 ### Question Generation
 
