@@ -1,0 +1,14 @@
+
+    .container{
+        flex: 1;
+    }
+    .arrow{
+        backgroundColor: "#256FE5";
+        padding: 13;
+        borderRadius: 100;
+    }
+    .touchableButton{
+        position: "absolute";
+        bottom: 100;
+        right: 20;
+    }

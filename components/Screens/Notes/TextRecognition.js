@@ -2,6 +2,7 @@ import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import { Alert, Button, Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import styles from './TextRecognition.module.css'; 
 
 const TextRecognition = () => {
 	const [imageUris, setImageUris] = useState([]);
@@ -207,33 +208,5 @@ const TextRecognition = () => {
 		</ScrollView>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		padding: 20,
-	},
-	button: {
-		marginBottom: 10,
-	},
-	imageContainer: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		justifyContent: "center",
-		marginBottom: 0,
-	},
-	image: {
-		width: 150,
-		height: 150,
-		margin: 5,
-	},
-	resultsContainer: {
-		marginBottom: 20,
-	},
-	resultText: {
-		marginBottom: 10,
-		fontSize: 16,
-	},
-});
 
 export default TextRecognition;

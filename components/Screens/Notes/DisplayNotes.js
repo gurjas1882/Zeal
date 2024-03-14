@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import styles from './DisplayNotes.module.css'; 
 
 const DisplayNotes = () => {
 	const [annotatedData, setAnnotatedData] = useState([]);
@@ -76,33 +77,5 @@ const DisplayNotes = () => {
 	);
 };
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		flexDirection: "row",
-		justifyContent: "center",
-		flexWrap: "wrap",
-	},
-	loadingContainer: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	loadingText: {
-		marginTop: 10,
-	},
-	noteContainer: {
-		marginVertical: 20,
-		paddingHorizontal: 20,
-	},
-	noteText: {
-		fontSize: 16,
-		marginBottom: 10,
-	},
-	noteImage: {
-		width: 150,
-		height: 150,
-	},
-});
 
 export default DisplayNotes;

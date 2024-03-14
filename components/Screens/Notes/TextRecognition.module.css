@@ -1,0 +1,31 @@
+.container {
+    flex: 1;
+    padding: 20px;
+}
+
+.button {
+    margin-bottom: 10px;
+}
+
+.imageContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 0;
+}
+
+.image {
+    width: 150px;
+    height: 150px;
+    margin: 5px;
+}
+
+.resultsContainer {
+    margin-bottom: 20px;
+}
+
+.resultText {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
