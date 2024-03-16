@@ -35,7 +35,7 @@ const HomeHeader = () => {
 					</View>
 				</TouchableOpacity>
 			</View>
-			<Text style={styles.timeText}>{greeting} Jaskaran</Text>
+			<Text style={styles.timeText}>{greeting} Suhani</Text>
 		</SafeAreaView>
 	);
 };

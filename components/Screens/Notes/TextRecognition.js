@@ -1,13 +1,16 @@
-import { Inter_800ExtraBold, useFonts } from "@expo-google-fonts/inter";
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold, Inter_900Black, useFonts } from "@expo-google-fonts/inter";
 import { useNavigation } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
-import { Alert, Button, Image, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Image, Keyboard, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { PlusSvg } from "../../../assets/icons/icons";
 
 const TextRecognition = () => {
 	const [imageUris, setImageUris] = useState([]);
 	const [ocrResults, setOcrResults] = useState([]);
+	const [name, setName] = useState("");
+	const [analyzing, setAnalyzing] = useState(false);
 
 	useEffect(() => {
 		(async () => {
@@ -20,6 +23,10 @@ const TextRecognition = () => {
 
 	useFonts({
 		Inter_800ExtraBold,
+		Inter_700Bold,
+		Inter_600SemiBold,
+		Inter_900Black,
+		Inter_400Regular,
 	});
 
 	const pickImage = async () => {
@@ -85,14 +92,18 @@ const TextRecognition = () => {
 			return;
 		}
 
+		setAnalyzing(true);
+		navigation.canGoBack(false);
+
 		for (const uri of imageUris) {
 			const { result, base64Image } = await analyzeImage(uri);
 			results.push(result);
 			base64Images.push(base64Image);
 		}
 
-		saveAnnotatedData(base64Images, results); // Save annotated data
+		saveAnnotatedData(base64Images, results);
 		setOcrResults(results);
+		navigation.goBack();
 	};
 
 	const analyzeImage = async (uri) => {
@@ -101,7 +112,7 @@ const TextRecognition = () => {
 				encoding: FileSystem.EncodingType.Base64,
 			});
 
-			const apiKey = "";
+			const apiKey = "AIzaSyA9g-1bw2e2UvQLXv7hZhR5d7akJjLYoFQ";
 			const apiEndpoint = "https://vision.googleapis.com/v1/images:annotate?key=" + apiKey;
 
 			const requestData = {
@@ -137,39 +148,13 @@ const TextRecognition = () => {
 	const saveAnnotatedData = async (base64Images, annotatedData) => {
 		try {
 			const directory = FileSystem.documentDirectory;
-			const fileName = `annotated_data_${new Date().getTime()}.json`; // Unique file name
+			const fileName = `annotated_data_${new Date().getTime()}.json`;
 
 			const dataToSave = { images: base64Images, ocrResults: annotatedData };
 
 			await FileSystem.writeAsStringAsync(directory + fileName, JSON.stringify(dataToSave));
-
-			Alert.alert("Data Saved", "Annotated data saved successfully");
 		} catch (error) {
 			console.error("Error saving data:", error);
-			Alert.alert("Error", "An error occurred while saving data");
-		}
-	};
-
-	const retrieveAllAnnotatedData = async () => {
-		try {
-			const directory = FileSystem.documentDirectory;
-			const files = await FileSystem.readDirectoryAsync(directory);
-			const annotatedDataFiles = files.filter((file) => file.startsWith("annotated_data_"));
-
-			const allAnnotatedData = [];
-
-			for (const file of annotatedDataFiles) {
-				const fileContent = await FileSystem.readAsStringAsync(directory + file);
-				const parsedData = JSON.parse(fileContent);
-				const images = parsedData.images.map((base64) => `data:image/jpeg;base64,${base64}`);
-				const ocrResults = parsedData.ocrResults;
-				allAnnotatedData.push({ images, ocrResults });
-			}
-
-			return allAnnotatedData;
-		} catch (error) {
-			console.error("Error retrieving data:", error);
-			throw new Error("An error occurred while retrieving data");
 		}
 	};
 
@@ -198,75 +183,264 @@ const TextRecognition = () => {
 	};
 
 	return (
-		<View style={styles.container}>
-			<View style={styles.topContainer}>
-				<View style={styles.button}>
-					<Button title="Cancel" onPress={handleCancel} buttonStyle={styles.buttonStyle} titleStyle={styles.buttonText} />
+		<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+			<View style={styles.container}>
+				<View style={styles.topContainer}>
+					{!analyzing && (
+						<TouchableOpacity onPress={handleCancel} style={styles.button}>
+							<Text style={styles.buttonText}>Cancel</Text>
+						</TouchableOpacity>
+					)}
+
+					<Text style={styles.centeredText}>Create</Text>
 				</View>
-				<Text style={styles.centeredText}>Create</Text>
-			</View>
 
-			<Button title="Pick Images" onPress={pickImage} style={styles.button} />
-			<Button title="Take Photo" onPress={takePhoto} style={styles.button} />
-			<Button title="Continue" onPress={analyzeImages} style={styles.button} />
-			<Button title="Reset Saved Data" onPress={resetSavedData} style={styles.button} />
-
-			<View style={styles.imageContainer}>
-				{imageUris.map((uri, index) => (
-					<Image key={index} source={{ uri: uri }} style={styles.image} />
-				))}
+				<View style={styles.statusContainer}>
+					<View style={styles.uploadContainer}>
+						<View style={[styles.uploadUpperTextContainer, { backgroundColor: analyzing ? "#F8F9FE" : "#006FFD" }]}>
+							<Text style={[styles.uploadUpperText, { color: analyzing ? "#8F9098" : "white" }]}>1</Text>
+						</View>
+						<Text style={[styles.uploadUnderText, { color: analyzing ? "#8F9098" : "#1F2024" }]}>Upload</Text>
+					</View>
+					<View style={styles.analyzeContainer}>
+						<View style={[styles.analyzeUpperTextContainer, { backgroundColor: analyzing ? "#006FFD" : "#F8F9FE" }]}>
+							<Text style={[styles.analyzeUpperText, { color: analyzing ? "white" : "#8F9098" }]}>2</Text>
+						</View>
+						<Text style={[styles.analyzeUnderText, { color: analyzing ? "#1F2024" : "#8F9098" }]}>Analyze</Text>
+					</View>
+				</View>
+				{analyzing ? (
+					<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+						<Text style={styles.analyzeImagesHeaderText}>Analyzing Images</Text>
+						<Text style={styles.analyzeImagesUnderText}>Stand By...</Text>
+						<ActivityIndicator size="large" color="blue" style={{ marginTop: 25 }} />
+					</View>
+				) : (
+					<View style={{ flex: 1 }}>
+						<View style={styles.informationContainer}>
+							<Text style={styles.informationHeaderText}>let's create a new note!</Text>
+							<Text style={styles.informationUnderText}>Let's get started with some basic information.</Text>
+						</View>
+						<View style={styles.nameContainer}>
+							<Text style={styles.nameText}>Name</Text>
+							<TextInput value={name} onChangeText={setName} style={styles.textInput} placeholder="Type Here..." />
+						</View>
+						<View style={styles.imageContainer}>
+							<Text style={styles.imageText}>Upload Images</Text>
+							<ScrollView horizontal={true}>
+								<View style={styles.imageWrapper}>
+									{imageUris.map((uri, index) => (
+										<Image key={index} source={{ uri: uri }} style={{ height: 150, width: 120, marginRight: 10, borderRadius: 14 }} resizeMode="cover" />
+									))}
+									<TouchableOpacity
+										style={styles.createImage}
+										onPress={() => {
+											Alert.alert(
+												"Upload Image",
+												"Alert Message",
+												[
+													{ text: "Take Photo", onPress: takePhoto },
+													{ text: "Pick Images", onPress: pickImage },
+													{ text: "Cancel", style: "cancel" },
+												],
+												{ cancelable: false }
+											);
+										}}
+									>
+										<PlusSvg color={"#006FFD"} />
+									</TouchableOpacity>
+								</View>
+							</ScrollView>
+						</View>
+						<TouchableOpacity onPress={analyzeImages} style={styles.continueButton}>
+							<Text style={styles.continueText}>Continue</Text>
+						</TouchableOpacity>
+					</View>
+				)}
 			</View>
-			<View style={styles.resultsContainer}>
-				{ocrResults.map((result, index) => (
-					<Text key={index} style={styles.resultText}>
-						{result}
-					</Text>
-				))}
-			</View>
-		</View>
+		</TouchableWithoutFeedback>
 	);
 };
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		backgroundColor: "#fff",
 	},
 	topContainer: {
 		flexDirection: "row",
 		justifyContent: "center",
 		alignItems: "center",
-		padding: 10,
+		padding: 25,
 	},
 	button: {
 		position: "absolute",
-		left: 12,
+		left: 20,
 		borderRadius: 5,
 	},
 	buttonText: {
-		color: "white",
-		fontSize: 1,
+		color: "rgb(0, 122, 255)",
+		fontSize: 16,
 	},
 	centeredText: {
 		fontSize: 16,
 		fontFamily: "Inter_800ExtraBold",
+		fontWeight: "bold",
+	},
+	statusContainer: {
+		backgroundColor: "#F8F9FE",
+		justifyContent: "center",
+		alignItems: "center",
+		flexDirection: "row",
+		height: 100,
+		width: "88%",
+		marginLeft: "6%",
+		borderRadius: 18,
+	},
+	uploadContainer: {
+		justifyContent: "center",
+		alignItems: "center",
+		width: "50%",
+	},
+	uploadUpperText: {
+		fontFamily: "Inter_600SemiBold",
+		fontSize: 12,
+	},
+	uploadUpperTextContainer: {
+		width: 25,
+		height: 25,
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 100,
+		marginBottom: 10,
+	},
+	uploadUnderText: {
+		fontFamily: "Inter_700Bold",
+		color: "#1F2024",
+	},
+	analyzeContainer: {
+		justifyContent: "center",
+		alignItems: "center",
+		width: "50%",
+	},
+	analyzeUpperText: {
+		color: "#8F9098",
+		fontFamily: "Inter_600SemiBold",
+		fontSize: 12,
+	},
+	analyzeUpperTextContainer: {
+		width: 25,
+		height: 25,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "#F8F9FE",
+		borderRadius: 100,
+		marginBottom: 10,
+	},
+	analyzeUnderText: {
+		fontFamily: "Inter_700Bold",
+		color: "#8F9098",
+	},
+	analyzingContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	analyzeImagesHeaderText: {
+		fontFamily: "Inter_700Bold",
+		color: "#1F2024",
+		fontSize: 30,
+		marginBottom: 10,
+	},
+	analyzeImagesUnderText: {
+		fontFamily: "Inter_400Regular",
+		color: "#71727A",
+		fontSize: 20,
+	},
+	contentContainer: {
+		flex: 1,
+	},
+	informationContainer: {
+		justifyContent: "center",
+		height: 100,
+		width: "88%",
+		marginLeft: "6%",
+		borderRadius: 18,
+	},
+	informationHeaderText: {
+		fontFamily: "Inter_900Black",
+		fontSize: 18,
+		color: "#1F2024",
+		marginBottom: 10,
+	},
+	informationUnderText: {
+		fontFamily: "Inter_400Regular",
+		fontSize: 14,
+		color: "#71727A",
+	},
+	nameContainer: {
+		justifyContent: "center",
+		height: 100,
+		width: "88%",
+		marginLeft: "6%",
+		borderRadius: 18,
+	},
+	nameText: {
+		fontFamily: "Inter_700Bold",
+		color: "#1F2024",
+	},
+	textInput: {
+		borderWidth: 1,
+		borderColor: "#C5C6CC",
+		borderRadius: 12,
+		width: "90%",
+		paddingHorizontal: 15,
+		paddingVertical: 15,
+		marginTop: 5,
+		fontFamily: "Inter_400Regular",
+		color: "#8F9098",
 	},
 	imageContainer: {
-		flexDirection: "row",
-		flexWrap: "wrap",
 		justifyContent: "center",
-		marginBottom: 0,
+		width: "88%",
+		marginLeft: "6%",
+		borderRadius: 18,
+	},
+	imageText: {
+		fontFamily: "Inter_700Bold",
+		color: "#1F2024",
+		marginBottom: 10,
+	},
+	createImage: {
+		height: 150,
+		width: 120,
+		backgroundColor: "#EAF2FF",
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 14,
+	},
+	imageWrapper: {
+		flexDirection: "row",
 	},
 	image: {
 		width: 150,
 		height: 150,
-		margin: 5,
+		marginHorizontal: 5,
+		borderRadius: 14,
 	},
-	resultsContainer: {
-		marginBottom: 20,
+	continueButton: {
+		backgroundColor: "#006FFD",
+		width: "88%",
+		position: "absolute",
+		bottom: 0,
+		left: "6%",
+		padding: 15,
+		borderRadius: 12,
 	},
-	resultText: {
-		marginBottom: 10,
-		fontSize: 16,
+	continueText: {
+		textAlign: "center",
+		color: "white",
+		fontFamily: "Inter_600SemiBold",
 	},
 });
 

@@ -1,10 +1,9 @@
+import { Inter_400Regular, Inter_900Black, useFonts } from "@expo-google-fonts/inter";
 import { useNavigation } from "@react-navigation/native";
-import { useFonts, Inter_900Black, Inter_400Regular } from "@expo-google-fonts/inter";
 
 import React, { useCallback, useState } from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+import { StyleSheet, Text, View } from "react-native";
+import ActionCreator from "../../Buttons/ActionButton";
 
 const HomeContent = () => {
 	const navigation = useNavigation();
@@ -30,7 +29,7 @@ const HomeContent = () => {
 		<View>
 			{contentLoaded ? (
 				<View style={[styles.headerContent, { paddingHorizontal: "8%" }]}>
-					<Text style={styles.headerText}>Begin Working</Text>
+					<Text style={styles.headerText}>Continue Working</Text>
 				</View>
 			) : (
 				<View style={[styles.headerContent, { paddingHorizontal: "8%" }]}>
@@ -41,6 +40,33 @@ const HomeContent = () => {
 					</View>
 				</View>
 			)}
+			<View style={[styles.headerContent, { paddingHorizontal: "8%", marginTop: "4%" }]}>
+				<Text style={styles.headerText}>Discover</Text>
+				<ActionCreator
+					title="test your knowledge"
+					underText="answer ai-generated questions"
+					action={() => {
+						navigation.navigate("Notes");
+					}}
+					color={"#3471D3"}
+				/>
+				<ActionCreator
+					title="prepare for your exam"
+					underText="interactive study material"
+					action={() => {
+						navigation.navigate("Notes");
+					}}
+					color={"#4E87E2"}
+				/>
+				<ActionCreator
+					title="generate magic notes"
+					underText="use your notes to create adaptive material"
+					action={() => {
+						navigation.navigate("Notes");
+					}}
+					color={"#87B2F8"}
+				/>
+			</View>
 		</View>
 	);
 };
@@ -57,7 +83,7 @@ const styles = StyleSheet.create({
 		height: 185,
 		width: "104%",
 		marginLeft: "-2%",
-		marginTop: 10,
+		marginTop: "4%",
 		backgroundColor: "#EAF2FF",
 		borderRadius: 12,
 		justifyContent: "center",

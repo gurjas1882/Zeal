@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import AllButton from './Notes/AllButton'; // Check the path
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 import DisplayNotes from '../components/Screens/Notes/DisplayNotes'; // Check the path
+import {ImageSvg} from '../assets/icons/icons'; // Import the ImageSvg component
 
 const NotesScreen = () => {
   const navigation = useNavigation(); // Initialize navigation hook
@@ -52,7 +53,10 @@ const NotesScreen = () => {
       {showAllNotes ? (
         <View style={styles.centerContainer}>
           {notes.length === 0 ? (
-            <Text style={styles.nothingText}>There is nothing there</Text>
+            <View>
+            <Text style={styles.nothingText1}>Nothing here. For now.</Text>
+            <Text style={styles.nothingText2}>This is where you'll find your notes</Text>
+            </View>
           ) : (
             <DisplayNotes />
           )}
@@ -103,15 +107,29 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  nothingText: {
+  nothingText1: {
+    fontSize: 20,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  nothingText2: {
     fontSize: 16,
     textAlign: 'center',
+    color: "grey",
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  icon: {
+		alignItems: "center",
+		backgroundColor: "#F1F1F1",
+		borderRadius: 12,
+		height: 40,
+		justifyContent: "center",
+		width: 40,
+	}
 });
 
 export default NotesScreen;
