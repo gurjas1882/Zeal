@@ -4,7 +4,8 @@ import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import { Montserrat_400Regular_Italic, useFonts } from "@expo-google-fonts/montserrat";
 import DisplayNotes from "./DisplayNotes";
-//import styles from './Notes.module.css'; 
+import Svg, { Mask, Path, Rect } from "react-native-svg";
+
 
 const Notes = () => {
     const navigation = useNavigation();
@@ -18,6 +19,7 @@ const Notes = () => {
 
     return (
         <View style={styles.container}>
+            
             <ScrollView>
                 {/* Your ScrollView content here */}
                 <DisplayNotes />
@@ -35,6 +37,7 @@ const Notes = () => {
         </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
