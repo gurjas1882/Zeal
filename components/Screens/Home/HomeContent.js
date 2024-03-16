@@ -4,8 +4,6 @@ import { useFonts, Inter_900Black, Inter_400Regular } from "@expo-google-fonts/i
 import React, { useCallback, useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
-
 const HomeContent = () => {
 	const navigation = useNavigation();
 	const [contentLoaded, setContentLoaded] = useState(false);

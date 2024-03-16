@@ -1,5 +1,5 @@
 import React from "react";
-import Svg, { Path } from "react-native-svg";
+import Svg, { G, Mask, Path } from "react-native-svg";
 
 const HomeSvg = ({ color }) => (
 	<Svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} fill="none" viewBox="0 0 24 24">
@@ -49,4 +49,25 @@ const NotificationSvg = ({ color }) => (
 	</Svg>
 );
 
-export { HomeSvg, NotesSvg, PlantSvg, NotificationSvg };
+const PlusSvg = ({ color }) => (
+	<Svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} fill="none">
+		<Mask
+			id="a"
+			width={24}
+			height={24}
+			x={0}
+			y={0}
+			maskUnits="userSpaceOnUse"
+			style={{
+				maskType: "alpha",
+			}}
+		>
+			<Path fill={color} d="M13.5 2a1.5 1.5 0 0 0-3 0v8.5H2a1.5 1.5 0 0 0 0 3h8.5V22a1.5 1.5 0 0 0 3 0v-8.5H22a1.5 1.5 0 0 0 0-3h-8.5V2Z" />
+		</Mask>
+		<G mask="url(#a)">
+			<Path fill={color} d="M0 0h24v24H0z" />
+		</G>
+	</Svg>
+);
+
+export { HomeSvg, NotesSvg, PlantSvg, NotificationSvg, PlusSvg };
