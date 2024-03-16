@@ -1,10 +1,8 @@
 import { Montserrat_400Regular_Italic, Montserrat_700Bold_Italic, useFonts } from "@expo-google-fonts/montserrat";
-import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Dimensions, Platform, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import colors from "../../Utilities/Colors";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { NotificationSvg } from "../../../assets/icons/icons";
 
 const HomeHeader = () => {
 	let [fontsLoaded] = useFonts({
@@ -12,68 +10,67 @@ const HomeHeader = () => {
 		Montserrat_400Regular_Italic,
 	});
 
-	const insets = useSafeAreaInsets();
+	useFonts({
+		"Sora-Regular": require("../../../assets/Sora/Sora-Regular.ttf"),
+	});
 
 	if (!fontsLoaded) {
 		return null;
 	}
 
-	const screenWidth = Dimensions.get("window").width;
-	const screenHeight = Dimensions.get("window").height;
+	const currentHour = new Date().getHours();
+	const greeting = currentHour >= 5 && currentHour < 12 ? "Good morning" : currentHour >= 12 && currentHour < 18 ? "Good afternoon" : "Good evening";
+
+	const handleIconPress = () => {
+		console.log("Icon pressed!");
+	};
 
 	return (
-		<SafeAreaView style={[styles.container, { height: Platform.OS === "android" ? screenHeight * 0.25 : screenHeight * 0.3 }]}>
-			<LinearGradient
-				style={[
-					styles.gradient,
-					{
-						height: Platform.OS === "android" ? screenHeight * 0.25 : screenHeight * 0.3,
-						paddingBottom: insets.bottom,
-						paddingTop: insets.top,
-						marginTop: -insets.top,
-					},
-				]}
-				colors={[colors["gradient-blue-1"], colors["gradient-blue-2"]]}
-			>
-				<View style={styles.headerContent}>
-					<Text style={styles.headerText}>ZEAL</Text>
-					<Ionicons name="notifications" size={screenWidth * 0.08} color="white" />
-				</View>
-			</LinearGradient>
+		<SafeAreaView style={styles.container}>
+			<View style={styles.headerContent}>
+				<Text style={styles.headerText}>ZEAL</Text>
+				<TouchableOpacity onPress={handleIconPress}>
+					<View style={styles.icon}>
+						<NotificationSvg color="#1F2024" />
+					</View>
+				</TouchableOpacity>
+			</View>
+			<Text style={styles.timeText}>{greeting} Jaskaran</Text>
 		</SafeAreaView>
 	);
 };
 
 const styles = StyleSheet.create({
-	container: {
-		backgroundColor: colors["progress-blue"],
-	},
 	headerContent: {
+		alignItems: "center",
 		flexDirection: "row",
 		justifyContent: "space-between",
-		alignItems: "center",
 		paddingHorizontal: "8%",
 		paddingTop: "8%",
 	},
-	headerText: {
-		fontSize: Dimensions.get("window").width * 0.1,
-		fontWeight: "bold",
-		color: "white",
-		fontFamily: "Montserrat_700Bold_Italic",
-		letterSpacing: -5,
-		fontStyle: "italic",
-	},
-	underTextContent: {
+	icon: {
 		alignItems: "center",
-		marginTop: "6%",
+		backgroundColor: "#F1F1F1",
+		borderRadius: 12,
+		height: 40,
+		justifyContent: "center",
+		width: 40,
 	},
-	underText: {
-		fontSize: Dimensions.get("window").width * 0.05,
-		color: "white",
-		fontFamily: "Montserrat_400Regular_Italic",
-		alignSelf: "flex-start",
-		paddingHorizontal: "7%",
-		paddingBottom: "3%",
+	headerText: {
+		color: "#1F2024",
+		fontFamily: "Montserrat_700Bold_Italic",
+		fontSize: 36,
+		fontStyle: "italic",
+		fontWeight: "bold",
+		letterSpacing: -5,
+	},
+	timeText: {
+		color: "#1F2024",
+		fontFamily: "Sora-Regular",
+		fontSize: 18,
+		fontWeight: "bold",
+		paddingHorizontal: "8%",
+		paddingTop: "4%",
 	},
 });
 

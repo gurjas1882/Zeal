@@ -7,11 +7,8 @@ import PlantGrowing from "../components/Screens/Home/modules/PlantGrowing";
 const HomeScreen = () => {
 	return (
 		<ScrollView style={styles.scrollView}>
-			<StatusBar barStyle="light-content" />
+			<StatusBar barStyle="dark-content" />
 			<HomeHeader />
-			<View style={{ alignItems: "center" }}>
-				<PlantGrowing />
-			</View>
 			<HomeContent />
 		</ScrollView>
 	);
@@ -21,6 +18,6 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
 	scrollView: {
-		maxHeight: Dimensions.get("window").height - 80,
+		backgroundColor: "white",
 	},
 });

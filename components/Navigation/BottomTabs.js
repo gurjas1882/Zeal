@@ -1,36 +1,44 @@
 import React from "react";
+import { Text } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Entypo, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useFonts } from "expo-font";
+import { HomeSvg, NotesSvg, PlantSvg } from "../../assets/icons/icons";
 import HomeScreen from "../../screens/HomeScreen";
-import LearnScreen from "../../screens/NotesScreen";
+import NotesScreen from "../../screens/NotesScreen";
 import PlantScreen from "../../screens/PlantScreen";
-import ProfileScreen from "../../screens/ProfileScreen";
 
-// Initialize the bottom tab navigator
 const Tab = createBottomTabNavigator();
 
-// Common options - spread to each of the tab screen elements
 const tabBarOptions = {
-	tabBarLabel: "",
 	headerShown: false,
-	tabBarLabelStyle: { color: "white" },
 };
 
-// Main component
-
 const BottomTabs = () => {
+	const [fontsLoaded] = useFonts({
+		"Sora-SemiBold": require("../../assets/Sora/Sora-SemiBold.ttf"),
+		"Sora-Light": require("../../assets/Sora/Sora-Light.ttf"),
+	});
+
 	return (
 		<Tab.Navigator
 			screenOptions={{
 				tabBarStyle: {
-					backgroundColor: "white",
 					position: "absolute",
 					bottom: 15,
 					left: 0,
+					height: 90,
 					paddingTop: 13,
-					height: 80,
-					elevation: 0,
+					backgroundColor: "white",
+					elevation: 5,
 					marginBottom: -15,
+					borderTopStartRadius: 26,
+					borderTopEndRadius: 26,
+					borderWidth: 0,
+					borderTopWidth: 0,
+					shadowColor: "#E4E4E4",
+					shadowOpacity: 0.25,
+					shadowOffset: { width: 0, height: -10 },
+					shadowRadius: 24,
 				},
 			}}
 		>
@@ -39,15 +47,37 @@ const BottomTabs = () => {
 				component={HomeScreen}
 				options={{
 					...tabBarOptions,
-					tabBarIcon: ({ focused }) => (focused ? <Entypo name="home" size={24} color="#3a86ff" /> : <Entypo name="home" size={24} color="black" />),
+					tabBarLabel: ({ focused }) => (
+						<Text
+							style={{
+								fontSize: 11,
+								fontFamily: focused ? "Sora-SemiBold" : "Sora-Light",
+								color: focused ? "#006FFD" : "#71727A",
+							}}
+						>
+							HOME
+						</Text>
+					),
+					tabBarIcon: ({ focused }) => (focused ? <HomeSvg color={"#006FFD"} /> : <HomeSvg color={"#71727A"} />),
 				}}
 			/>
 			<Tab.Screen
-				name="Learn"
-				component={LearnScreen}
+				name="Notes"
+				component={NotesScreen}
 				options={{
 					...tabBarOptions,
-					tabBarIcon: ({ focused }) => (focused ? <FontAwesome name="microphone" size={24} color="#3a86ff" /> : <FontAwesome name="microphone" size={24} color="black" />),
+					tabBarLabel: ({ focused }) => (
+						<Text
+							style={{
+								fontSize: 11,
+								fontFamily: focused ? "Sora-SemiBold" : "Sora-Light",
+								color: focused ? "#006FFD" : "#71727A",
+							}}
+						>
+							NOTES
+						</Text>
+					),
+					tabBarIcon: ({ focused }) => (focused ? <NotesSvg color={"#006FFD"} /> : <NotesSvg color={"#71727A"} />),
 				}}
 			/>
 			<Tab.Screen
@@ -55,15 +85,18 @@ const BottomTabs = () => {
 				component={PlantScreen}
 				options={{
 					...tabBarOptions,
-					tabBarIcon: ({ focused }) => (focused ? <MaterialCommunityIcons name="flower-tulip" size={24} color="#3a86ff" /> : <MaterialCommunityIcons name="flower-tulip" size={24} color="black" />),
-				}}
-			/>
-			<Tab.Screen
-				name="Profile"
-				component={ProfileScreen}
-				options={{
-					...tabBarOptions,
-					tabBarIcon: ({ focused }) => (focused ? <FontAwesome name="user" size={24} color="#3a86ff" /> : <FontAwesome name="user" size={24} color="black" />),
+					tabBarLabel: ({ focused }) => (
+						<Text
+							style={{
+								fontSize: 11,
+								fontFamily: focused ? "Sora-SemiBold" : "Sora-Light",
+								color: focused ? "#006FFD" : "#71727A",
+							}}
+						>
+							PLANT
+						</Text>
+					),
+					tabBarIcon: ({ focused }) => (focused ? <PlantSvg color={"#006FFD"} /> : <PlantSvg color={"#71727A"} />),
 				}}
 			/>
 		</Tab.Navigator>

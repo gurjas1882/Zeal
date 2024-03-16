@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Notes from "../components/Screens/Notes/Notes";
 import colors from "../components/Utilities/Colors";
 
-const LearnScreen = () => {
+const NotesScreen = () => {
 	const insets = useSafeAreaInsets();
 	const [fontsLoaded] = useFonts({
 		Montserrat_700Bold,
@@ -88,7 +88,7 @@ const LearnScreen = () => {
 	);
 };
 
-export default LearnScreen;
+export default NotesScreen;
 
 const styles = StyleSheet.create({
 	container: {

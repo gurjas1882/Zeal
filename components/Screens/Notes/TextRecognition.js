@@ -1,8 +1,9 @@
+import { Inter_800ExtraBold, useFonts } from "@expo-google-fonts/inter";
+import { useNavigation } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
-import { Alert, Button, Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import styles from './TextRecognition.module.css'; 
+import { Alert, Button, Image, StyleSheet, Text, View } from "react-native";
 
 const TextRecognition = () => {
 	const [imageUris, setImageUris] = useState([]);
@@ -16,6 +17,10 @@ const TextRecognition = () => {
 			}
 		})();
 	}, []);
+
+	useFonts({
+		Inter_800ExtraBold,
+	});
 
 	const pickImage = async () => {
 		let images = [];
@@ -186,8 +191,21 @@ const TextRecognition = () => {
 		}
 	};
 
+	const navigation = useNavigation();
+
+	const handleCancel = () => {
+		navigation.goBack();
+	};
+
 	return (
-		<ScrollView style={styles.container}>
+		<View style={styles.container}>
+			<View style={styles.topContainer}>
+				<View style={styles.button}>
+					<Button title="Cancel" onPress={handleCancel} buttonStyle={styles.buttonStyle} titleStyle={styles.buttonText} />
+				</View>
+				<Text style={styles.centeredText}>Create</Text>
+			</View>
+
 			<Button title="Pick Images" onPress={pickImage} style={styles.button} />
 			<Button title="Take Photo" onPress={takePhoto} style={styles.button} />
 			<Button title="Continue" onPress={analyzeImages} style={styles.button} />
@@ -205,8 +223,51 @@ const TextRecognition = () => {
 					</Text>
 				))}
 			</View>
-		</ScrollView>
+		</View>
 	);
 };
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+	},
+	topContainer: {
+		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center",
+		padding: 10,
+	},
+	button: {
+		position: "absolute",
+		left: 12,
+		borderRadius: 5,
+	},
+	buttonText: {
+		color: "white",
+		fontSize: 1,
+	},
+	centeredText: {
+		fontSize: 16,
+		fontFamily: "Inter_800ExtraBold",
+	},
+	imageContainer: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		justifyContent: "center",
+		marginBottom: 0,
+	},
+	image: {
+		width: 150,
+		height: 150,
+		margin: 5,
+	},
+	resultsContainer: {
+		marginBottom: 20,
+	},
+	resultText: {
+		marginBottom: 10,
+		fontSize: 16,
+	},
+});
 
 export default TextRecognition;

@@ -1,31 +1,32 @@
 .container {
-    flex: 1;
-    padding: 20px;
+	flex: 1;
+	padding: 30px;
+	background-color: black;
 }
 
 .button {
-    margin-bottom: 10px;
+	margin-bottom: 100px;
 }
 
 .imageContainer {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 0;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin-bottom: 0;
 }
 
 .image {
-    width: 150px;
-    height: 150px;
-    margin: 5px;
+	width: 150px;
+	height: 150px;
+	margin: 5px;
 }
 
 .resultsContainer {
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 .resultText {
-    margin-bottom: 10px;
-    font-size: 16px;
+	margin-bottom: 10px;
+	font-size: 16px;
 }
