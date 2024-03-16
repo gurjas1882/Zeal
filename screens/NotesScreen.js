@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import DisplayNotes from '../components/Screens/Notes/DisplayNotes';
-import AllButton from './Notes/AllButton'; // Import AllButton component
+import AllButton from './Notes/AllButton'; // Check the path
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
+import DisplayNotes from '../components/Screens/Notes/DisplayNotes'; // Check the path
 
 const NotesScreen = () => {
+  const navigation = useNavigation(); // Initialize navigation hook
+
   const [showAllNotes, setShowAllNotes] = useState(false);
+  const [notes, setNotes] = useState([]); // State to store notes
 
   const handleButtonClick = index => {
     setShowAllNotes(index === 0);
+  };
+
+  const navigateToCreateNote = () => {
+    navigation.navigate('NoteCreateMenu'); // Navigate to CreateNoteScreen
   };
 
   return (
@@ -41,11 +49,21 @@ const NotesScreen = () => {
       </View>
 
       {/* Render AllButton component if showAllNotes is true */}
-      {showAllNotes ? <AllButton /> : <DisplayNotes />}
+      {showAllNotes ? (
+        <View style={styles.centerContainer}>
+          {notes.length === 0 ? (
+            <Text style={styles.nothingText}>There is nothing there</Text>
+          ) : (
+            <DisplayNotes />
+          )}
+          <AllButton onPress={navigateToCreateNote} />
+        </View>
+      ) : (
+        <DisplayNotes />
+      )}
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -85,17 +103,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  noteContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    backgroundColor: '#f9f9f9',
-  },
-  noteTitle: {
+  nothingText: {
     fontSize: 16,
+    textAlign: 'center',
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
