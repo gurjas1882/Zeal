@@ -42,7 +42,30 @@ const HomeContent = () => {
 			)}
 			<View style={[styles.headerContent, { paddingHorizontal: "8%", marginTop: "4%" }]}>
 				<Text style={styles.headerText}>Discover</Text>
-				<ActionCreator title="test your knowledge" underText />
+				<ActionCreator
+					title="test your knowledge"
+					underText="answer ai-generated questions"
+					action={() => {
+						navigation.navigate("Notes");
+					}}
+					color={"#3471D3"}
+				/>
+				<ActionCreator
+					title="prepare for your exam"
+					underText="interactive study material"
+					action={() => {
+						navigation.navigate("Notes");
+					}}
+					color={"#4E87E2"}
+				/>
+				<ActionCreator
+					title="generate magic notes"
+					underText="use your notes to create adaptive material"
+					action={() => {
+						navigation.navigate("Notes");
+					}}
+					color={"#87B2F8"}
+				/>
 			</View>
 		</View>
 	);
