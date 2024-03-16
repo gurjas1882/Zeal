@@ -1,9 +1,9 @@
-import { Inter_400Regular, Inter_900Black, Inter_800ExtraBold, Inter_700Bold, Inter_600SemiBold, useFonts } from "@expo-google-fonts/inter";
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold, Inter_900Black, useFonts } from "@expo-google-fonts/inter";
 import { useNavigation } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
-import { Alert, Button, Image, StyleSheet, Text, View, TouchableOpacity, TextInput, TouchableWithoutFeedback, Keyboard, ScrollView, ActivityIndicator } from "react-native";
+import { ActivityIndicator, Alert, Image, Keyboard, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { PlusSvg } from "../../../assets/icons/icons";
 
 const TextRecognition = () => {
@@ -148,36 +148,13 @@ const TextRecognition = () => {
 	const saveAnnotatedData = async (base64Images, annotatedData) => {
 		try {
 			const directory = FileSystem.documentDirectory;
-			const fileName = `annotated_data_${new Date().getTime()}.json`; // Unique file name
+			const fileName = `annotated_data_${new Date().getTime()}.json`;
 
 			const dataToSave = { images: base64Images, ocrResults: annotatedData };
 
 			await FileSystem.writeAsStringAsync(directory + fileName, JSON.stringify(dataToSave));
 		} catch (error) {
 			console.error("Error saving data:", error);
-		}
-	};
-
-	const retrieveAllAnnotatedData = async () => {
-		try {
-			const directory = FileSystem.documentDirectory;
-			const files = await FileSystem.readDirectoryAsync(directory);
-			const annotatedDataFiles = files.filter((file) => file.startsWith("annotated_data_"));
-
-			const allAnnotatedData = [];
-
-			for (const file of annotatedDataFiles) {
-				const fileContent = await FileSystem.readAsStringAsync(directory + file);
-				const parsedData = JSON.parse(fileContent);
-				const images = parsedData.images.map((base64) => `data:image/jpeg;base64,${base64}`);
-				const ocrResults = parsedData.ocrResults;
-				allAnnotatedData.push({ images, ocrResults });
-			}
-
-			return allAnnotatedData;
-		} catch (error) {
-			console.error("Error retrieving data:", error);
-			throw new Error("An error occurred while retrieving data");
 		}
 	};
 
@@ -290,92 +267,25 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#fff",
 	},
-	analyzeImagesHeaderText: {
-		fontFamily: "Inter_700Bold",
-		color: "#1F2024",
-		fontSize: 30,
-		marginBottom: 10,
-	},
-	analyzeImagesUnderText: {
-		fontFamily: "Inter_400Regular",
-		color: "#71727A",
-		fontSize: 20,
-	},
-	continueButton: {
-		backgroundColor: "#006FFD",
-		width: "88%",
-		position: "absolute",
-		bottom: 0,
-		left: "6%",
-		padding: 15,
-		borderRadius: 12,
-	},
-	continueText: {
-		textAlign: "center",
-		color: "white",
-		fontFamily: "Inter_600SemiBold",
-	},
-	imageContainer: {
-		justifyContent: "center",
-		width: "88%",
-		marginLeft: "6%",
-		borderRadius: 18,
-	},
-	imageText: {
-		fontFamily: "Inter_700Bold",
-		color: "#1F2024",
-		marginBottom: 10,
-	},
-	createImage: {
-		height: 150,
-		width: 120,
-		backgroundColor: "#EAF2FF",
+	topContainer: {
+		flexDirection: "row",
 		justifyContent: "center",
 		alignItems: "center",
-		borderRadius: 14,
+		padding: 25,
 	},
-	imageWrapper: {
-		flexDirection: "row",
+	button: {
+		position: "absolute",
+		left: 20,
+		borderRadius: 5,
 	},
-	nameContainer: {
-		justifyContent: "center",
-		height: 100,
-		width: "88%",
-		marginLeft: "6%",
-		borderRadius: 18,
+	buttonText: {
+		color: "rgb(0, 122, 255)",
+		fontSize: 16,
 	},
-	nameText: {
-		fontFamily: "Inter_700Bold",
-		color: "#1F2024",
-	},
-	textInput: {
-		borderWidth: 1,
-		borderColor: "#C5C6CC",
-		borderRadius: 12,
-		width: "90%",
-		paddingHorizontal: 15,
-		paddingVertical: 15,
-		marginTop: 5,
-		fontFamily: "Inter_400Regular",
-		color: "#8F9098",
-	},
-	informationContainer: {
-		justifyContent: "center",
-		height: 100,
-		width: "88%",
-		marginLeft: "6%",
-		borderRadius: 18,
-	},
-	informationHeaderText: {
-		fontFamily: "Inter_900Black",
-		fontSize: 18,
-		color: "#1F2024",
-		marginBottom: 10,
-	},
-	informationUnderText: {
-		fontFamily: "Inter_400Regular",
-		fontSize: 14,
-		color: "#71727A",
+	centeredText: {
+		fontSize: 16,
+		fontFamily: "Inter_800ExtraBold",
+		fontWeight: "bold",
 	},
 	statusContainer: {
 		backgroundColor: "#F8F9FE",
@@ -431,37 +341,106 @@ const styles = StyleSheet.create({
 		fontFamily: "Inter_700Bold",
 		color: "#8F9098",
 	},
-	topContainer: {
-		flexDirection: "row",
+	analyzingContainer: {
+		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		padding: 25,
 	},
-	button: {
-		position: "absolute",
-		left: 20,
-		borderRadius: 5,
+	analyzeImagesHeaderText: {
+		fontFamily: "Inter_700Bold",
+		color: "#1F2024",
+		fontSize: 30,
+		marginBottom: 10,
 	},
-	buttonText: {
-		color: "rgb(0, 122, 255)",
-		fontSize: 16,
+	analyzeImagesUnderText: {
+		fontFamily: "Inter_400Regular",
+		color: "#71727A",
+		fontSize: 20,
 	},
-	centeredText: {
-		fontSize: 16,
-		fontFamily: "Inter_800ExtraBold",
-		fontWeight: "bold",
+	contentContainer: {
+		flex: 1,
+	},
+	informationContainer: {
+		justifyContent: "center",
+		height: 100,
+		width: "88%",
+		marginLeft: "6%",
+		borderRadius: 18,
+	},
+	informationHeaderText: {
+		fontFamily: "Inter_900Black",
+		fontSize: 18,
+		color: "#1F2024",
+		marginBottom: 10,
+	},
+	informationUnderText: {
+		fontFamily: "Inter_400Regular",
+		fontSize: 14,
+		color: "#71727A",
+	},
+	nameContainer: {
+		justifyContent: "center",
+		height: 100,
+		width: "88%",
+		marginLeft: "6%",
+		borderRadius: 18,
+	},
+	nameText: {
+		fontFamily: "Inter_700Bold",
+		color: "#1F2024",
+	},
+	textInput: {
+		borderWidth: 1,
+		borderColor: "#C5C6CC",
+		borderRadius: 12,
+		width: "90%",
+		paddingHorizontal: 15,
+		paddingVertical: 15,
+		marginTop: 5,
+		fontFamily: "Inter_400Regular",
+		color: "#8F9098",
+	},
+	imageContainer: {
+		justifyContent: "center",
+		width: "88%",
+		marginLeft: "6%",
+		borderRadius: 18,
+	},
+	imageText: {
+		fontFamily: "Inter_700Bold",
+		color: "#1F2024",
+		marginBottom: 10,
+	},
+	createImage: {
+		height: 150,
+		width: 120,
+		backgroundColor: "#EAF2FF",
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 14,
+	},
+	imageWrapper: {
+		flexDirection: "row",
 	},
 	image: {
 		width: 150,
 		height: 150,
-		margin: 5,
+		marginHorizontal: 5,
+		borderRadius: 14,
 	},
-	resultsContainer: {
-		marginBottom: 20,
+	continueButton: {
+		backgroundColor: "#006FFD",
+		width: "88%",
+		position: "absolute",
+		bottom: 0,
+		left: "6%",
+		padding: 15,
+		borderRadius: 12,
 	},
-	resultText: {
-		marginBottom: 10,
-		fontSize: 16,
+	continueText: {
+		textAlign: "center",
+		color: "white",
+		fontFamily: "Inter_600SemiBold",
 	},
 });
 
