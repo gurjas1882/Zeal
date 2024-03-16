@@ -1,33 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-
-const Note = ({ title }) => {
-  return (
-    <View style={styles.noteContainer}>
-      <Text style={styles.noteTitle}>{title}</Text>
-    </View>
-  );
-};
+import DisplayNotes from '../components/Screens/Notes/DisplayNotes';
+import AllButton from './Notes/AllButton'; // Import AllButton component
 
 const NotesScreen = () => {
-  const [notes, setNotes] = useState([
-    { title: 'All', isClicked: false },
-    { title: 'Favourite', isClicked: false },
-  ]);
+  const [showAllNotes, setShowAllNotes] = useState(false);
 
   const handleButtonClick = index => {
-    setNotes(prevNotes =>
-      prevNotes.map((note, i) => {
-        if (i === index) {
-          // Toggle clicked state for the new button
-          return { ...note, isClicked: !note.isClicked };
-        } else if (prevNotes[index].isClicked && i !== index) {
-          // Reset clicked state for the previously clicked button
-          return { ...note, isClicked: false };
-        }
-        return note;
-      })
-    );
+    setShowAllNotes(index === 0);
   };
 
   return (
@@ -37,12 +17,12 @@ const NotesScreen = () => {
 
       {/* Render the buttons container */}
       <View style={styles.buttonContainer}>
-        {/* Render the "All" button */}
+        {/* Render the "Note" button */}
         <TouchableOpacity
           onPress={() => handleButtonClick(0)}
           style={[
             styles.button,
-            notes[0].isClicked ? styles.buttonClicked : styles.buttonUnclicked,
+            showAllNotes ? styles.buttonClicked : styles.buttonUnclicked,
           ]}
         >
           <Text style={styles.buttonText}>All</Text>
@@ -53,15 +33,19 @@ const NotesScreen = () => {
           onPress={() => handleButtonClick(1)}
           style={[
             styles.button,
-            notes[1].isClicked ? styles.buttonClicked : styles.buttonUnclicked,
+            !showAllNotes ? styles.buttonClicked : styles.buttonUnclicked,
           ]}
         >
           <Text style={styles.buttonText}>Favorite</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Render AllButton component if showAllNotes is true */}
+      {showAllNotes ? <AllButton /> : <DisplayNotes />}
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
