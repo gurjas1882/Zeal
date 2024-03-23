@@ -9,17 +9,6 @@ const HomeContent = () => {
 	const navigation = useNavigation();
 	const [contentLoaded, setContentLoaded] = useState(false);
 
-	// Load fonts
-	const [fontsLoaded] = useFonts({
-		"Sora-SemiBold": require("../../../assets/Sora/Sora-SemiBold.ttf"),
-		"Sora-Light": require("../../../assets/Sora/Sora-Light.ttf"),
-	});
-
-	useFonts({
-		Inter_900Black,
-		Inter_400Regular,
-	});
-
 	// navigate to notes screen
 	const navigateToLearn = useCallback(() => {
 		navigation.navigate("Learn");
@@ -93,7 +82,7 @@ const styles = StyleSheet.create({
 		color: "#1F2024",
 		fontFamily: "Inter_900Black",
 		fontWeight: "bold",
-		letterSpacing: "0.5%",
+		letterSpacing: 0.5,
 		fontSize: 19,
 		width: "75%",
 		textAlign: "center",

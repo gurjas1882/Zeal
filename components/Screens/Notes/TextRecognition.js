@@ -5,6 +5,7 @@ import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Image, Keyboard, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { PlusSvg } from "../../../assets/icons/icons";
+import { GOOGLE_CLOUD_KEY } from "../../../config";
 
 const TextRecognition = () => {
 	const [imageUris, setImageUris] = useState([]);
@@ -20,14 +21,6 @@ const TextRecognition = () => {
 			}
 		})();
 	}, []);
-
-	useFonts({
-		Inter_800ExtraBold,
-		Inter_700Bold,
-		Inter_600SemiBold,
-		Inter_900Black,
-		Inter_400Regular,
-	});
 
 	const pickImage = async () => {
 		let images = [];
@@ -112,7 +105,7 @@ const TextRecognition = () => {
 				encoding: FileSystem.EncodingType.Base64,
 			});
 
-			const apiKey = "AIzaSyA9g-1bw2e2UvQLXv7hZhR5d7akJjLYoFQ";
+			const apiKey = GOOGLE_CLOUD_KEY;
 			const apiEndpoint = "https://vision.googleapis.com/v1/images:annotate?key=" + apiKey;
 
 			const requestData = {

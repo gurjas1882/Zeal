@@ -5,14 +5,6 @@ import { StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const UserDisplay = () => {
-	let [fontsLoaded] = useFonts({
-		Montserrat_700Bold,
-		Montserrat_400Regular_Italic,
-	});
-
-	if (!fontsLoaded) {
-		return null;
-	}
 	return (
 		<SafeAreaView style={styles.container}>
 			<FontAwesome name="user-circle-o" size={125} color="white" />

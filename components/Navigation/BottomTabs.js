@@ -14,11 +14,6 @@ const tabBarOptions = {
 };
 
 const BottomTabs = () => {
-	const [fontsLoaded] = useFonts({
-		"Sora-SemiBold": require("../../assets/Sora/Sora-SemiBold.ttf"),
-		"Sora-Light": require("../../assets/Sora/Sora-Light.ttf"),
-	});
-
 	return (
 		<Tab.Navigator
 			screenOptions={{

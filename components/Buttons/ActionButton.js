@@ -11,19 +11,6 @@ import { useFonts } from "expo-font";
  * @returns {JSX.Element} ActionCreator component
  */
 const ActionCreator = ({ title, action, underText, color }) => {
-	// Load external fonts
-
-	const [fontsLoaded] = useFonts({
-		"Sora-SemiBold": require("../../assets/Sora/Sora-SemiBold.ttf"),
-		"Sora-Light": require("../../assets/Sora/Sora-Light.ttf"),
-	});
-
-	// Safety check - return null if fonts aren't loaded
-
-	if (!fontsLoaded) {
-		return null;
-	}
-
 	// Render the button
 	return (
 		<TouchableOpacity style={[styles.container, { backgroundColor: color }]} onPress={action}>

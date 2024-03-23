@@ -3,10 +3,6 @@ import { StyleSheet, View, Animated, Easing } from "react-native";
 import { Montserrat_400Regular_Italic, useFonts } from "@expo-google-fonts/montserrat";
 
 const ProgressBar = ({ progress }) => {
-	let [fontsLoaded] = useFonts({
-		Montserrat_400Regular_Italic,
-	});
-
 	const widthAnimation = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {

@@ -1,26 +1,35 @@
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import { ActivityIndicator, Alert, SafeAreaView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import OPENAI_KEY, { GOOGLE_CLOUD_KEY } from "../../config";
+import { Circle, Defs, G, Rect, Svg } from "react-native-svg";
+import { useNavigation } from "@react-navigation/native";
 
 const KnowledgeTestingScreen = ({ route }) => {
 	const { annotatedData } = route.params;
 	const [randomQuestion, setRandomQuestion] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
+	const [isAnalyzing, setIsAnalyzing] = useState(false);
 	const [isRecording, setIsRecording] = useState(false);
 	const [transcription, setTranscription] = useState("");
 	const [grading, setGrading] = useState("");
 	const [feedback, setFeedback] = useState("");
 	const [recording, setRecording] = useState(null);
 	const [recordingUri, setRecordingUri] = useState(null);
-	const [sound, setSound] = useState(null);
+	const [timeElapsed, setTimeElapsed] = useState(0);
+	const [timeThinking, setTimeThinking] = useState(0);
+	const [timeRecording, setTimeRecording] = useState(0);
+	const [note, setNote] = useState("");
+
+	const navigation = useNavigation();
 
 	async function generateQuestions(schoolNoteText) {
 		try {
 			const apiEndpoint = "https://api.openai.com/v1/chat/completions";
 			const headers = {
 				"Content-Type": "application/json",
-				Authorization: `Bearer `,
+				Authorization: `Bearer ${OPENAI_KEY}`,
 			};
 
 			const requestBody = {
@@ -76,11 +85,24 @@ const KnowledgeTestingScreen = ({ route }) => {
 		getPermission();
 		const allText = annotatedData.map((item) => item.text).join(" ");
 		generateQuestions(allText);
+		setNote(allText);
+	}, []);
+
+	useEffect(() => {
+		// Start the timer as soon as the component mounts
+		const timer = setInterval(() => {
+			setTimeElapsed((prevTime) => prevTime + 1);
+		}, 1000);
+
+		// Cleanup function to clear the timer on component unmount
+		return () => clearInterval(timer);
 	}, []);
 
 	const startRecording = async () => {
 		try {
 			setIsRecording(true);
+			setTimeThinking(timeElapsed);
+			setTimeElapsed(0);
 			await Audio.setAudioModeAsync({
 				allowsRecordingIOS: true,
 				playsInSilentModeIOS: true,
@@ -117,14 +139,15 @@ const KnowledgeTestingScreen = ({ route }) => {
 
 	const stopRecording = async () => {
 		try {
+			setTimeRecording(timeElapsed);
 			setIsRecording(false);
+			setIsAnalyzing(true);
 			if (recording) {
 				await recording.stopAndUnloadAsync();
 				const uri = await recording.getURI();
 				setRecordingUri(uri);
 
 				const base64String = await FileSystem.readAsStringAsync(uri, { encoding: "base64" });
-				await loadAudio(base64String);
 
 				const request = {
 					config: {
@@ -137,7 +160,7 @@ const KnowledgeTestingScreen = ({ route }) => {
 					},
 				};
 
-				const speechResponse = await fetch("https://speech.googleapis.com/v1/speech:recognize?key=", {
+				const speechResponse = await fetch("https://speech.googleapis.com/v1/speech:recognize?key=" + GOOGLE_CLOUD_KEY, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -157,7 +180,7 @@ const KnowledgeTestingScreen = ({ route }) => {
 						const apiEndpoint = "https://api.openai.com/v1/chat/completions";
 						const headers = {
 							"Content-Type": "application/json",
-							Authorization: `Bearer `,
+							Authorization: `Bearer ${OPENAI_KEY}`,
 						};
 						console.log(`Question: ${randomQuestion}\n\nAnswer: ${data.results[0].alternatives[0].transcript}`);
 
@@ -166,11 +189,12 @@ const KnowledgeTestingScreen = ({ route }) => {
 							messages: [
 								{
 									role: "system",
-									content: "Provide a grading out of 100 of how well the provided question was answered with provided answer.",
+									content:
+										"Provide a grading out of 100 of how well the provided question was answered with provided answer. Use this format to display the grading: \n\nGrade: 'Grade Here' \n\nFeedback: 'Feedback Here' ",
 								},
 								{
 									role: "user",
-									content: `Question: ${randomQuestion}\n\nAnswer: ${data.results[0].alternatives[0].transcript}`,
+									content: `Question: ${randomQuestion}\n\nAnswer: ${data.results[0].alternatives[0].transcript}\n\n Use this note to conduct your grade: ${note}`,
 								},
 							],
 							temperature: 0.7,
@@ -189,15 +213,20 @@ const KnowledgeTestingScreen = ({ route }) => {
 						}
 
 						const responseData = await response.json();
-						const answer = responseData.choices[0].message.content.trim();
+						const answer = responseData.choices[0].message.content.trim().split("\n"); // Split by newline characters
 						console.log(answer);
 
-						const gradeRegex = /Grade:\s*(.+?)(?=\s*Feedback:|$)/;
-						const [_, grade] = answer.match(gradeRegex) || [, null];
-						const feedback = answer.replace(gradeRegex, "").trim();
+						let grade, feedback;
+
+						answer.forEach((line) => {
+							const [key, value] = line.split(":").map((part) => part.trim());
+							if (key === "Grade") grade = value;
+							if (key === "Feedback") feedback = value;
+						});
 
 						setGrading(grade);
 						setFeedback(feedback);
+						navigation.navigate("GradeScreen", { grading: grade, feedback: feedback, thinkingTime: timeThinking, recordingTime: timeRecording });
 					} catch (error) {
 						console.error("Error generating questions:", error);
 					}
@@ -211,27 +240,12 @@ const KnowledgeTestingScreen = ({ route }) => {
 		}
 	};
 
-	const loadAudio = async (base64String) => {
-		try {
-			const { sound: newSound } = await Audio.Sound.createAsync({ uri: `data:audio/wav;base64,${base64String}` }, { shouldPlay: false });
-			setSound(newSound);
-		} catch (error) {
-			console.error("Error loading audio:", error);
-		}
-	};
-
-	const playAudio = async () => {
-		try {
-			if (sound) {
-				await sound.playAsync();
-			}
-		} catch (error) {
-			console.error("Error playing audio:", error);
-		}
+	const handleCancel = () => {
+		navigation.goBack();
 	};
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			{isLoading ? (
 				<View style={styles.loadingContainer}>
 					<ActivityIndicator size="large" color="blue" />
@@ -239,31 +253,87 @@ const KnowledgeTestingScreen = ({ route }) => {
 				</View>
 			) : (
 				<>
-					<Text style={styles.question}>{randomQuestion}</Text>
-					<TouchableWithoutFeedback onPress={isRecording ? stopRecording : startRecording}>
-						<View style={styles.button}>
-							<Text style={styles.buttonText}>{isRecording ? "Stop Recording" : "Start Recording"}</Text>
+					{isAnalyzing ? (
+						<View style={styles.loadingContainer}>
+							<ActivityIndicator size="large" color="blue" />
+							<Text style={styles.loadingText}>Analyzing Data</Text>
 						</View>
-					</TouchableWithoutFeedback>
-					<TouchableWithoutFeedback onPress={playAudio}>
-						<View style={styles.button}>
-							<Text style={styles.buttonText}>Replay Audio</Text>
-						</View>
-					</TouchableWithoutFeedback>
-					<Text style={styles.transcription}>{transcription}</Text>
-					<Text style={styles.grading}>{grading}</Text>
-					<Text style={styles.feedback}>{feedback}</Text>
+					) : (
+						<>
+							<View style={styles.topContainer}>
+								<TouchableOpacity onPress={handleCancel} style={styles.button}>
+									<Text style={styles.buttonText}>Cancel</Text>
+								</TouchableOpacity>
+
+								<Text style={styles.centeredText}>Questions</Text>
+							</View>
+							<View style={styles.submissionGuidelines}>
+								<Text style={styles.submissionGuidelinesHeader}>Submission Guidelines</Text>
+								<Text style={styles.submissionGuidelinesText}>
+									Ensure your responses are complete, as grades are assigned based on clarity, accuracy, and detail. There are no time constraints on recordings, but a timer is available if you wish
+									to impose your own limits.
+								</Text>
+							</View>
+							<View style={styles.questionContainer}>
+								<Text style={styles.questionHeader}>Question</Text>
+								<Text style={styles.question}>{randomQuestion}</Text>
+							</View>
+							<View style={styles.statusContainer}>
+								<Text style={styles.statusHeader}>{isRecording ? "Recording" : "Thinking"}</Text>
+								<Text style={styles.timeElapsed}>
+									{Math.floor(timeElapsed / 60)}:{timeElapsed % 60 < 10 ? "0" : ""}
+									{timeElapsed % 60}
+								</Text>
+							</View>
+
+							<TouchableWithoutFeedback onPress={isRecording ? stopRecording : startRecording}>
+								<View style={styles.record}>
+									{isRecording ? (
+										<Svg xmlns="http://www.w3.org/2000/svg" width={78} height={78} fill="none">
+											<G filter="url(#a)">
+												<Circle cx={39} cy={35} r={33.5} fill="#fff" stroke="#FF5B5B" strokeWidth={3} />
+												<Rect width={20} height={20} x={29} y={25} fill="#FF5B5B" rx={4} />
+											</G>
+											<Defs></Defs>
+										</Svg>
+									) : (
+										<Svg xmlns="http://www.w3.org/2000/svg" width={70} height={70} fill="none">
+											<Circle cx={35} cy={35} r={35} fill="#FF5B5B" />
+										</Svg>
+									)}
+								</View>
+							</TouchableWithoutFeedback>
+						</>
+					)}
 				</>
 			)}
-		</View>
+		</SafeAreaView>
 	);
 };
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
+	topContainer: {
+		flexDirection: "row",
 		justifyContent: "center",
 		alignItems: "center",
+		padding: 25,
+	},
+	button: {
+		position: "absolute",
+		left: 20,
+		borderRadius: 5,
+	},
+	buttonText: {
+		color: "rgb(0, 122, 255)",
+		fontSize: 16,
+	},
+	centeredText: {
+		fontSize: 16,
+		fontFamily: "Inter_800ExtraBold",
+		fontWeight: "bold",
+	},
+	container: {
+		flex: 1,
 		padding: 20,
 	},
 	loadingContainer: {
@@ -275,27 +345,83 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		marginTop: 10,
 	},
-	question: {
-		fontSize: 18,
+	submissionGuidelines: {
+		width: "100%",
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	submissionGuidelinesHeader: {
+		fontSize: 16,
 		fontWeight: "bold",
 		textAlign: "center",
+		marginBottom: 5,
+		color: "#1F2024",
+		marginTop: 20,
+		fontFamily: "Inter_900Black",
+	},
+	submissionGuidelinesText: {
+		fontSize: 12,
+		fontWeight: "light",
+		textAlign: "center",
+		color: "#71727A",
+		width: "90%",
 		marginBottom: 20,
+		fontFamily: "Inter_400Regular",
 	},
-	button: {
-		backgroundColor: "blue",
-		padding: 10,
-		borderRadius: 5,
-		marginBottom: 10,
+	questionContainer: {
+		width: "100%",
+		justifyContent: "center",
+		alignItems: "center",
+		marginTop: 40,
 	},
-	buttonText: {
-		fontSize: 20,
+	questionHeader: {
+		fontSize: 25,
 		fontWeight: "bold",
-		color: "white",
+		textAlign: "center",
+		marginBottom: 5,
+		color: "#1F2024",
+		fontFamily: "Inter_900Black",
+	},
+	question: {
+		fontSize: 16,
+		fontWeight: "light",
+		textAlign: "center",
+		color: "#71727A",
+		fontFamily: "Inter_400Regular",
+		width: "50%",
+	},
+	record: {
+		justifyContent: "center",
+		alignItems: "center",
 	},
 	transcription: {
 		fontSize: 18,
 		textAlign: "center",
 		marginTop: 20,
+	},
+	statusContainer: {
+		width: "100%",
+		justifyContent: "center",
+		alignItems: "center",
+		marginBottom: 60,
+		marginTop: 40,
+	},
+	statusHeader: {
+		fontSize: 16,
+		fontWeight: "light",
+		textAlign: "center",
+		marginBottom: 5,
+		color: "#1F2024",
+		fontFamily: "Inter_400Regular",
+	},
+	timeElapsed: {
+		fontSize: 20,
+		fontWeight: "bold",
+		textAlign: "center",
+		marginBottom: 5,
+		letterSpacing: 1,
+		fontFamily: "Inter_700Bold",
+		color: "#1F2024",
 	},
 	grading: {
 		// Style for grading text

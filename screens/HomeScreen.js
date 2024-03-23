@@ -10,7 +10,7 @@ const HomeScreen = () => {
 	const inset = useSafeAreaInsets();
 
 	return (
-		<ScrollView style={[styles.scrollView, { height: height - inset.top - inset.bottom - 75 }]}>
+		<ScrollView style={styles.scrollView}>
 			<StatusBar barStyle="dark-content" />
 			<HomeHeader />
 			<HomeContent />

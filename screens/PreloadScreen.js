@@ -3,14 +3,6 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 const PreloadScreen = () => {
-	let [fontsLoaded] = useFonts({
-		Montserrat_700Bold_Italic,
-		Montserrat_400Regular_Italic,
-	});
-
-	if (!fontsLoaded) {
-		return null;
-	}
 	return (
 		<View style={styles.loadingContainer}>
 			<Text style={styles.loadingText}>ZEAL</Text>
